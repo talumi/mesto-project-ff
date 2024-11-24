@@ -69,7 +69,9 @@ function openImage(evt) {
   const description = evt.target.parentElement.querySelector('.card__description').textContent;
 
   popupImage.src = link;
+  popupImage.alt = description;
   popupCaption.textContent = description;
+  
   openModal(imagePopup);
 }
 

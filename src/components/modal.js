@@ -1,32 +1,30 @@
 export function openModal(popup) {
   popup.classList.add('popup_is-opened');
-  document.addEventListener('keydown', closeModalEsc);
-  const closeButton = popup.querySelector('.popup__close');
-  const onCloseClick = () => {
-    closeModal(popup);
-    closeButton.removeEventListener('click', onCloseClick);
-  }
-  closeButton.addEventListener('click', onCloseClick);
+  document.addEventListener('keydown', onPressEsc);
   setTimeout(() => {
-    document.addEventListener('click', closeModalOverlay)
+    document.addEventListener('click', onClickOutside)
   }, 1);
 }
 
 export function closeModal(popup) {
   popup.classList.remove('popup_is-opened');
-  document.removeEventListener('keydown', closeModalEsc);
-  document.removeEventListener('click', closeModalOverlay);
+  document.removeEventListener('keydown', onPressEsc);
+  document.removeEventListener('click', onClickOutside);
 }
 
-function closeModalEsc(evt) {
+function onPressEsc(evt) {
   if (evt.key === 'Escape') {
     const openedPopup = document.querySelector('.popup_is-opened');
     closeModal(openedPopup);
   }
 }
 
-function closeModalOverlay(evt) {
-  if (evt.target.classList.contains('popup')) {
+function onClickOutside(evt) {
+  let evtClassList = evt.target.classList;
+  if (evtClassList.contains('popup')) {
     closeModal(evt.target);
+  }
+  if (evtClassList.contains('popup__close')) {
+    closeModal(evt.target.closest('.popup'));
   }
 }

@@ -32,7 +32,7 @@
       © 2021 Mesto Russia
     </p>
   </footer>
-  <div class="popup popup_type_edit popup_is-animated">
+  <div class="popup popup_type_profile-info-edit popup_is-animated">
     <div class="popup__content">
       <button type="button" class="popup__close"></button>
       <h3 class="popup__title">Редактировать профиль</h3>
@@ -61,7 +61,24 @@
           required
         >
         <span class="description-input-error popup__input-error"></span>
-        <button type="submit" class="button popup__button">Сохранить</button>
+        <button type="submit" name="button" class="button popup__button">Сохранить</button>
+      </form>
+    </div>
+  </div>
+  <div class="popup popup_type_profile-image-edit popup_is-animated">
+    <div class="popup__content">
+      <button type="button" class="popup__close"></button>
+      <h3 class="popup__title">Обновить аватар</h3>
+      <form class="popup__form" name="new-profile-image">
+        <input id="link-input"
+          type="url"
+          name="link"
+          class="popup__input popup__input_type_url"
+          placeholder="Ссылка на картинку"
+          required
+        >
+        <span class="link-input-error popup__input-error"></span>
+        <button type="submit" name="button" class="button popup__button">Сохранить</button>
       </form>
     </div>
   </div>
@@ -92,6 +109,13 @@
         <span class="link-input-error popup__input-error"></span>
         <button type="submit" name="button" class="button popup__button">Сохранить</button>
       </form>
+    </div>
+  </div>
+  <div class="popup popup_type_delete-card popup_is-animated">
+    <div class="popup__content">
+      <button type="button" class="popup__close"></button>
+      <h3 class="popup__title">Вы уверены?</h3>
+      <button type="button" name="button" class="button popup__button">Да</button>
     </div>
   </div>
   <div class="popup popup_type_image popup_is-animated">

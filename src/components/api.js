@@ -55,6 +55,23 @@ export const updateProfileImage = (value) => {
     });
 }
 
+export const editProfileInfo = (name, about) => {
+  return fetch('https://nomoreparties.co/v1/wff-cohort-28/users/me', {
+    method: 'PATCH',
+    headers: config.headers,
+    body: JSON.stringify({
+      name: name,
+      about: about
+    })
+  })
+    .then((res) => {
+      if(res.ok) {
+        return res.json;
+      }
+      return Promise.reject(`Ошибка: ${res.status}`);
+    });
+}
+
 export const putLike = (cardId) => {
   return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
     method: 'PUT',
@@ -80,11 +97,11 @@ export const deleteLike = (cardId) => {
       if(res.ok) {
         return res.json();
       }
-      /*return Promise.reject(`Ошибка: ${res.status}`);*/
+      return Promise.reject(`Ошибка: ${res.status}`);
     })
-    /*.catch((err) => {
+    .catch((err) => {
       console.log('Ошибка. Запрос не выполнен: ', err);
-    });*/
+    });
 }
 
 export const addNewCardRequest = (element) => {

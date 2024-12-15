@@ -3,7 +3,8 @@ import { initialCards } from './components/cards.js';
 import { createCard, deleteCard, setLikeState } from './components/card.js';
 import { openModal, closeModal } from './components/modal.js';
 import { enableValidation, clearValidation } from './components/validation.js';
-import { userRequest, getInitialCards, updateProfileImage, putLike, deleteLike, addNewCardRequest, deleteCardRequest } from './components/api.js';
+import { userRequest, getInitialCards, updateProfileImage, putLike, deleteLike,
+          addNewCardRequest, deleteCardRequest, editProfileInfo } from './components/api.js';
 
 const placesList = document.querySelector('.places__list');
 
@@ -49,50 +50,30 @@ const validationConfig = {
 profileEditButton.addEventListener('click', () => {
   profileTitleField.value = profileTitle.textContent;
   profileDescriptionField.value = profileDescription.textContent;
-  profileForm.addEventListener('submit', handleFormSubmit);
+  profileForm.addEventListener('submit', handleEditFormSubmit);
   clearValidation(profileForm, validationConfig);
   openModal(profileEditPopup);
 });
 
-function handleFormSubmit(evt) {
+function handleEditFormSubmit(evt) {
   evt.preventDefault();
   profileEditFormSubmitButton.textContent = 'Сохранение...';
-  fetch('https://nomoreparties.co/v1/wff-cohort-28/users/me', {
-    method: 'PATCH',
-    headers: {
-      authorization: '9494bd33-a3e0-4c43-b033-3b2e454315dd',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      name: profileTitleField.value,
-      about: profileDescriptionField.value
-    })
-  })
-    .then((res) => {
-      if(res.ok) {
-        return res.json;
-      }
-      return Promise.reject(`Ошибка: ${res.status}`);
-    })
+  editProfileInfo(profileTitleField.value, profileDescriptionField.value)
     .then(() => {
       profileTitle.textContent = profileTitleField.value;
       profileDescription.textContent = profileDescriptionField.value;
-      profileForm.removeEventListener('submit', handleFormSubmit);
+      profileForm.removeEventListener('submit', handleEditFormSubmit);
       closeModal(profileEditPopup);
     });
 }
 
 addNewCardButton.addEventListener('click', () => {
   newCardForm.addEventListener('submit', createNewCard);
-  clearNewCardForm();
+  newCardName.value = '';
+  newCardLink.value = '';
   clearValidation(newCardForm, validationConfig);
   openModal(newCardPopup);
 });
-
-function clearNewCardForm() { // TODO clearForm
-  newCardName.value = '';
-  newCardLink.value = '';
-}
 
 function createNewCard(evt) {
   const newElement = {
@@ -119,7 +100,6 @@ function openImage(evt) {
   popupImage.src = link;
   popupImage.alt = description;
   popupCaption.textContent = description;
-  console.log(description);
 
   openModal(imagePopup);
 }
@@ -160,14 +140,8 @@ function createLikeCardCallback(cardId) {
 
 enableValidation(validationConfig);
 
-Promise.all([userRequest(), getInitialCards()]).then((data) => {
-  const user = data[0];
-  const cards = data[1];
-  profileTitle.textContent = user['name'];
-  profileDescription.textContent = user['about'];
-  profileImage.style.backgroundImage = `url('${user['avatar']}')`;
-  profileImage.addEventListener('click', () => {
-    profileImageLink.value = ''; // TODO create a func
+function editProfileImage() {
+  profileImageLink.value = '';
     clearValidation(profileImageForm, validationConfig);
     openModal(profileImageEditPopup);
     profileImageForm.addEventListener('submit', (evt) => {
@@ -179,8 +153,16 @@ Promise.all([userRequest(), getInitialCards()]).then((data) => {
           closeModal(profileImageEditPopup);
         })
     });
+}
 
-  });
+Promise.all([userRequest(), getInitialCards()]).then((data) => {
+  const user = data[0];
+  const cards = data[1];
+  profileTitle.textContent = user['name'];
+  profileDescription.textContent = user['about'];
+  profileImage.style.backgroundImage = `url('${user['avatar']}')`;
+
+  profileImage.addEventListener('click', editProfileImage);
 
   cards.forEach(element => {
     const likesList = element['likes'];

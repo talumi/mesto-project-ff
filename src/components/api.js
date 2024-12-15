@@ -87,7 +87,7 @@ export const deleteLike = (cardId) => {
     });*/
 }
 
-export const addNewCard = (element) => {
+export const addNewCardRequest = (element) => {
   return fetch(`${config.baseUrl}/cards`, {
     method: 'POST',
     headers: config.headers,
@@ -95,6 +95,25 @@ export const addNewCard = (element) => {
       name: element['name'],
       link: element['link']
     })
+  })
+    .then((res) => {
+      if(res.ok) {
+        return res.json()
+      }
+      return Promise.reject(`Ошибка: ${res.status}`);
+    })
+    .catch((err) => {
+      console.log('Ошибка. Запрос не выполнен: ', err);
+    });
+}
+
+export const deleteCardRequest = (cardId) => {
+  return fetch(`https://nomoreparties.co/v1/wff-cohort-28/cards/${cardId}`, {
+    method: 'DELETE',
+    headers: {
+      authorization: '9494bd33-a3e0-4c43-b033-3b2e454315dd',
+      'Content-Type': 'application/json'
+    }
   })
     .then((res) => {
       if(res.ok) {

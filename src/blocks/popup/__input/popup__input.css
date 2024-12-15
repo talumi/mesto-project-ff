@@ -6,8 +6,8 @@
   font-size: 14px;
   line-height: 18px;
   box-sizing: border-box;
-  padding: 10px 0 0;
-  margin-bottom: 10px;
+  /*padding: 10px 0 0;
+  margin-bottom: 10px;*/
 }
 
 .popup__input:last-of-type {
@@ -24,6 +24,10 @@
   font-weight: 400;
   font-size: 12px;
   line-height: 1.2em;
+  min-height: 2.4em;
+  padding: 0;
+  display: block;
+  margin-top: 5px;
 }
 
 .popup__error_visible {

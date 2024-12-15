@@ -3,7 +3,7 @@ import { initialCards } from './components/cards.js';
 import { createCard, deleteCard, setLikeState } from './components/card.js';
 import { openModal, closeModal } from './components/modal.js';
 import { enableValidation, clearValidation } from './components/validation.js';
-import { userRequest, getInitialCards, updateProfileImage, putLike, deleteLike, addNewCard } from './components/api.js';
+import { userRequest, getInitialCards, updateProfileImage, putLike, deleteLike, addNewCardRequest, deleteCardRequest } from './components/api.js';
 
 const placesList = document.querySelector('.places__list');
 
@@ -89,7 +89,7 @@ addNewCardButton.addEventListener('click', () => {
   openModal(newCardPopup);
 });
 
-function clearNewCardForm() {
+function clearNewCardForm() { // TODO clearForm
   newCardName.value = '';
   newCardLink.value = '';
 }
@@ -103,12 +103,12 @@ function createNewCard(evt) {
   evt.preventDefault();
   newCardSubmitButton.textContent = 'Сохранение...';
 
-  addNewCard(newElement)
+  addNewCardRequest(newElement)
     .then((data) => {
       placesList.prepend(createCard(data, createDeleteCallback(data['_id']), createLikeCardCallback(data['_id']), false, openImage));
       initialCards.unshift(newElement);
       closeModal(newCardPopup);
-      newCardPopup.removeEventListener('submit', addNewCard);
+      newCardPopup.removeEventListener('submit', createNewCard);
     })
 }
 
@@ -130,21 +130,17 @@ function createDeleteCallback(cardId) {
     const submitButton = deleteAlertPopup.querySelector('.popup__button');
     submitButton.addEventListener('click', () => {
       deleteCard(evt);
-      fetch(`https://nomoreparties.co/v1/wff-cohort-28/cards/${cardId}`, {
-        method: 'DELETE',
-        headers: {
-          authorization: '9494bd33-a3e0-4c43-b033-3b2e454315dd',
-          'Content-Type': 'application/json'
-        }
-      });
-      closeModal(deleteAlertPopup);
+      deleteCardRequest(cardId)
+        .then(() => {
+          closeModal(deleteAlertPopup);
+        })
     });
   };
 }
 
 function createLikeCardCallback(cardId) {
   return function (evt) {
-    const likesCounter = evt.target.closest('.like-container').querySelector('.card__like-number');
+    const likesCounter = evt.target.closest('.like-container').querySelector('.card__like-count');
 
     if (evt.target.classList.contains('card__like-button_is-active')) {
       deleteLike(cardId)
@@ -169,7 +165,7 @@ Promise.all([userRequest(), getInitialCards()]).then((data) => {
   const cards = data[1];
   profileTitle.textContent = user['name'];
   profileDescription.textContent = user['about'];
-  profileImage.style.backgroundImage = `url('${user['avatar']}')`; // TODO backgroundImage ?
+  profileImage.style.backgroundImage = `url('${user['avatar']}')`;
   profileImage.addEventListener('click', () => {
     profileImageLink.value = ''; // TODO create a func
     clearValidation(profileImageForm, validationConfig);
@@ -178,11 +174,6 @@ Promise.all([userRequest(), getInitialCards()]).then((data) => {
       evt.preventDefault();
       profileImageFormSubmitButton.textContent = 'Сохранение...';
       updateProfileImage(profileImageLink.value)
-        .then(res => {
-          if (res.ok) {
-            return res.json();
-          }
-        })
         .then(() => {
           profileImage.style.backgroundImage = `url(${profileImageLink.value})`;
           closeModal(profileImageEditPopup);

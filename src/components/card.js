@@ -6,7 +6,7 @@ export function createCard(element, deleteCard, likeCard, isLiked, openImage) {
   const cardImage = cardElement.querySelector('.card__image');
   const deleteButton = cardElement.querySelector('.card__delete-button');
   const likeButton = cardElement.querySelector('.card__like-button');
-  const likeNumber = cardElement.querySelector('.card__like-number');
+  const likeNumber = cardElement.querySelector('.card__like-count');
 
   cardTitle.textContent = element['name'];
   cardImage.src = element['link'];

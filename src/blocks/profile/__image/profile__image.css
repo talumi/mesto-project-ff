@@ -12,8 +12,8 @@
 .profile__image:hover {
   background-color: black;
   cursor: pointer;
-  background-image: url('/src/images/edit.jpg');
 }
+
 
 @media screen and (max-width: 740px) {
   .profile__image {

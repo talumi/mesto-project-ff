@@ -1,5 +1,4 @@
 import './pages/index.css';
-import { initialCards } from './components/cards.js';
 import { createCard, deleteCard, setLikeState } from './components/card.js';
 import { openModal, closeModal } from './components/modal.js';
 import { enableValidation, clearValidation } from './components/validation.js';
@@ -47,13 +46,11 @@ const validationConfig = {
   errorClass: 'popup__error_visible'
 };
 
-profileEditButton.addEventListener('click', () => {
-  profileTitleField.value = profileTitle.textContent;
-  profileDescriptionField.value = profileDescription.textContent;
-  profileForm.addEventListener('submit', handleEditFormSubmit);
-  clearValidation(profileForm, validationConfig);
-  openModal(profileEditPopup);
-});
+enableValidation(validationConfig);
+
+profileForm.addEventListener('submit', handleEditFormSubmit);
+newCardForm.addEventListener('submit', createNewCardSubmit);
+profileImageForm.addEventListener('submit', editProfileImageSubmit);
 
 function handleEditFormSubmit(evt) {
   evt.preventDefault();
@@ -62,20 +59,15 @@ function handleEditFormSubmit(evt) {
     .then(() => {
       profileTitle.textContent = profileTitleField.value;
       profileDescription.textContent = profileDescriptionField.value;
-      profileForm.removeEventListener('submit', handleEditFormSubmit);
       closeModal(profileEditPopup);
-    });
+      profileEditFormSubmitButton.textContent = 'Сохранение';
+    })
+    .catch((err) => {
+      console.log('Ошибка. Запрос не выполнен: ', err);
+    })
 }
 
-addNewCardButton.addEventListener('click', () => {
-  newCardForm.addEventListener('submit', createNewCard);
-  newCardName.value = '';
-  newCardLink.value = '';
-  clearValidation(newCardForm, validationConfig);
-  openModal(newCardPopup);
-});
-
-function createNewCard(evt) {
+function createNewCardSubmit(evt) {
   const newElement = {
     name: newCardName.value,
     link: newCardLink.value
@@ -87,11 +79,41 @@ function createNewCard(evt) {
   addNewCardRequest(newElement)
     .then((data) => {
       placesList.prepend(createCard(data, createDeleteCallback(data['_id']), createLikeCardCallback(data['_id']), false, openImage));
-      initialCards.unshift(newElement);
       closeModal(newCardPopup);
-      newCardPopup.removeEventListener('submit', createNewCard);
+      newCardSubmitButton.textContent = 'Сохранение';
     })
+    .catch((err) => {
+      console.log('Ошибка. Запрос не выполнен: ', err);
+    });
 }
+
+function editProfileImageSubmit(evt) {
+  evt.preventDefault();
+    profileImageFormSubmitButton.textContent = 'Сохранение...';
+    updateProfileImage(profileImageLink.value)
+      .then(() => {
+        profileImage.style.backgroundImage = `url(${profileImageLink.value})`;
+        closeModal(profileImageEditPopup);
+        profileImageFormSubmitButton.textContent = 'Сохранение';
+      })
+      .catch((err) => {
+        console.log('Ошибка. Запрос не выполнен: ', err);
+      });
+}
+
+profileEditButton.addEventListener('click', () => {
+  profileTitleField.value = profileTitle.textContent;
+  profileDescriptionField.value = profileDescription.textContent;
+  clearValidation(profileForm, validationConfig);
+  openModal(profileEditPopup);
+});
+
+addNewCardButton.addEventListener('click', () => {
+  newCardName.value = '';
+  newCardLink.value = '';
+  clearValidation(newCardForm, validationConfig);
+  openModal(newCardPopup);
+});
 
 function openImage(evt) {
   const link = evt.target.src;
@@ -104,17 +126,30 @@ function openImage(evt) {
   openModal(imagePopup);
 }
 
+function editProfileImage() {
+  profileImageLink.value = '';
+  clearValidation(profileImageForm, validationConfig);
+  openModal(profileImageEditPopup);
+}
+
+let actualCallback;
+
 function createDeleteCallback(cardId) {
   return function (evt) {
     openModal(deleteAlertPopup);
     const submitButton = deleteAlertPopup.querySelector('.popup__button');
-    submitButton.addEventListener('click', () => {
+    submitButton.removeEventListener('click', actualCallback);
+    actualCallback = () => {
       deleteCard(evt);
       deleteCardRequest(cardId)
         .then(() => {
           closeModal(deleteAlertPopup);
         })
-    });
+        .catch((err) => {
+          console.log('Ошибка. Запрос не выполнен: ', err);
+        });
+    };
+    submitButton.addEventListener('click', actualCallback);
   };
 }
 
@@ -126,33 +161,22 @@ function createLikeCardCallback(cardId) {
       deleteLike(cardId)
       .then((data) => {
         likesCounter.textContent = data['likes'].length;
+        setLikeState(evt.target, false);
+      })
+      .catch((err) => {
+        console.log('Ошибка. Запрос не выполнен: ', err);
       });
-      setLikeState(evt.target, false);
     } else {
       putLike(cardId)
       .then((data) => {
         likesCounter.textContent = data['likes'].length;
+        setLikeState(evt.target, true);
+      })
+      .catch((err) => {
+        console.log('Ошибка. Запрос не выполнен: ', err);
       });
-      setLikeState(evt.target, true);
     }
   }
-}
-
-enableValidation(validationConfig);
-
-function editProfileImage() {
-  profileImageLink.value = '';
-    clearValidation(profileImageForm, validationConfig);
-    openModal(profileImageEditPopup);
-    profileImageForm.addEventListener('submit', (evt) => {
-      evt.preventDefault();
-      profileImageFormSubmitButton.textContent = 'Сохранение...';
-      updateProfileImage(profileImageLink.value)
-        .then(() => {
-          profileImage.style.backgroundImage = `url(${profileImageLink.value})`;
-          closeModal(profileImageEditPopup);
-        })
-    });
 }
 
 Promise.all([userRequest(), getInitialCards()]).then((data) => {

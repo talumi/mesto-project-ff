@@ -35,7 +35,7 @@ export const updateProfileImage = (value) => {
 }
 
 export const editProfileInfo = (name, about) => {
-  return request('https://nomoreparties.co/v1/wff-cohort-28/users/me', {
+  return request(`${config.baseUrl}/users/me`, {
     method: 'PATCH',
     headers: config.headers,
     body: JSON.stringify({
@@ -71,7 +71,7 @@ export const addNewCardRequest = (element) => {
 }
 
 export const deleteCardRequest = (cardId) => {
-  return request(`https://nomoreparties.co/v1/wff-cohort-28/cards/${cardId}`, {
+  return request(`${config.baseUrl}/cards/${cardId}`, {
     method: 'DELETE',
     headers: config.headers
   });

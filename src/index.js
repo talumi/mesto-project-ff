@@ -60,11 +60,13 @@ function handleEditFormSubmit(evt) {
       profileTitle.textContent = profileTitleField.value;
       profileDescription.textContent = profileDescriptionField.value;
       closeModal(profileEditPopup);
-      profileEditFormSubmitButton.textContent = 'Сохранение';
     })
     .catch((err) => {
       console.log('Ошибка. Запрос не выполнен: ', err);
     })
+    .finally(() => {
+      profileEditFormSubmitButton.textContent = 'Сохранение';
+    });
 }
 
 function createNewCardSubmit(evt) {
@@ -80,10 +82,12 @@ function createNewCardSubmit(evt) {
     .then((data) => {
       placesList.prepend(createCard(data, createDeleteCallback(data['_id']), createLikeCardCallback(data['_id']), false, openImage));
       closeModal(newCardPopup);
-      newCardSubmitButton.textContent = 'Сохранение';
     })
     .catch((err) => {
       console.log('Ошибка. Запрос не выполнен: ', err);
+    })
+    .finally(() => {
+      newCardSubmitButton.textContent = 'Сохранение';
     });
 }
 
@@ -94,10 +98,12 @@ function editProfileImageSubmit(evt) {
       .then(() => {
         profileImage.style.backgroundImage = `url(${profileImageLink.value})`;
         closeModal(profileImageEditPopup);
-        profileImageFormSubmitButton.textContent = 'Сохранение';
       })
       .catch((err) => {
         console.log('Ошибка. Запрос не выполнен: ', err);
+      })
+      .finally(() => {
+        profileImageFormSubmitButton.textContent = 'Сохранение';
       });
 }
 
